@@ -15,9 +15,13 @@
  * limitations under the License.
  */
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/../autoload.php';
-}
+namespace Google\Service;
+
+use Google\Exception;
+use Google\Model;
+use Google\Http\REST;
+use Google\Http\Request;
+use Google\Http\MediaFileUpload;
 
 /**
  * Implements the actual methods/resources of the discovered Google API using magic function
@@ -25,7 +29,7 @@ if (!class_exists('Google_Client')) {
  * is available in this service, and if so construct an apiHttpRequest representing it.
  *
  */
-class Google_Service_Resource
+class Resource
 {
   // Valid query parameters that work, but don't appear in discovery.
   private $stackParameters = array(
@@ -44,7 +48,7 @@ class Google_Service_Resource
   /** @var string $rootUrl */
   private $rootUrl;
 
-  /** @var Google_Client $client */
+  /** @var Google\Client $client */
   private $client;
 
   /** @var string $serviceName */
@@ -76,8 +80,8 @@ class Google_Service_Resource
    * @param $name
    * @param $arguments
    * @param $expected_class - optional, the expected class name
-   * @return Google_Http_Request|expected_class
-   * @throws Google_Exception
+   * @return Google\Http\Request|expected_class
+   * @throws Google\Exception
    */
   public function call($name, $arguments, $expected_class = null)
   {
@@ -91,7 +95,7 @@ class Google_Service_Resource
           )
       );
 
-      throw new Google_Exception(
+      throw new Exception(
           "Unknown function: " .
           "{$this->serviceName}->{$this->resourceName}->{$name}()"
       );
@@ -103,7 +107,7 @@ class Google_Service_Resource
     // document as parameter, but we abuse the param entry for storing it.
     $postBody = null;
     if (isset($parameters['postBody'])) {
-      if ($parameters['postBody'] instanceof Google_Model) {
+      if ($parameters['postBody'] instanceof Model) {
         // In the cases the post body is an existing object, we want
         // to use the smart method to create a simple object for
         // for JSONification.
@@ -145,7 +149,7 @@ class Google_Service_Resource
                 'parameter' => $key
             )
         );
-        throw new Google_Exception("($name) unknown parameter: '$key'");
+        throw new Exception("($name) unknown parameter: '$key'");
       }
     }
 
@@ -163,7 +167,7 @@ class Google_Service_Resource
                 'parameter' => $paramName
             )
         );
-        throw new Google_Exception("($name) missing required param: '$paramName'");
+        throw new Exception("($name) missing required param: '$paramName'");
       }
       if (isset($parameters[$paramName])) {
         $value = $parameters[$paramName];
@@ -186,12 +190,12 @@ class Google_Service_Resource
         )
     );
 
-    $url = Google_Http_REST::createRequestUri(
+    $url = REST::createRequestUri(
         $this->servicePath,
         $method['path'],
         $parameters
     );
-    $httpRequest = new Google_Http_Request(
+    $httpRequest = new Request(
         $url,
         $method['httpMethod'],
         null,
@@ -217,7 +221,7 @@ class Google_Service_Resource
     if (isset($parameters['data']) &&
         ($parameters['uploadType']['value'] == 'media' || $parameters['uploadType']['value'] == 'multipart')) {
       // If we are doing a simple media upload, trigger that as a convenience.
-      $mfu = new Google_Http_MediaFileUpload(
+      $mfu = new MediaFileUpload(
           $this->client,
           $httpRequest,
           isset($parameters['mimeType']) ? $parameters['mimeType']['value'] : 'application/octet-stream',

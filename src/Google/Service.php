@@ -17,6 +17,9 @@
 
 namespace Google;
 
+use Google\Client;
+use Google\Http\Batch;
+
 class Service
 {
   public $batchPath;
@@ -27,14 +30,14 @@ class Service
   public $resource;
   private $client;
 
-  public function __construct(Google_Client $client)
+  public function __construct(Client $client)
   {
     $this->client = $client;
   }
 
   /**
-   * Return the associated Google_Client class.
-   * @return Google_Client
+   * Return the associated Google\Client class.
+   * @return Google\Client
    */
   public function getClient()
   {
@@ -44,11 +47,11 @@ class Service
   /**
    * Create a new HTTP Batch handler for this service
    *
-   * @return Google_Http_Batch
+   * @return Google\Http\Batch
    */
   public function createBatch()
   {
-    return new Google_Http_Batch(
+    return new Google\Http\Batch(
         $this->client,
         false,
         $this->rootUrl,

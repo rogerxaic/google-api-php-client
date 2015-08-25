@@ -9,7 +9,7 @@ use Google\Model;
  * exposes the items array for iteration, so you can just
  * iterate over the object rather than a reference inside.
  */
-class Collection extends Model implements Iterator, Countable
+class Collection extends Model implements \Iterator, \Countable
 {
   protected $collection_key = 'items';
 

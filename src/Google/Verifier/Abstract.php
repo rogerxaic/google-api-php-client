@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2013 Google Inc.
+ * Copyright 2011 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,16 @@
  * limitations under the License.
  */
 
-namespace Google\Auth;
-
-use Google\Exception as Ex;
-
-class Exception extends Ex
+/**
+ * Verifies signatures.
+ *
+ * @author Brian Eaton <beaton@google.com>
+ */
+abstract class Google_Verifier_Abstract
 {
+  /**
+   * Checks a signature, returns true if the signature is correct,
+   * false otherwise.
+   */
+  abstract public function verify($data, $signature);
 }

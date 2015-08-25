@@ -17,10 +17,10 @@
 
 namespace Google\Service;
 
-use Google\Exception;
+use Google\Exception as Ex;
 use Google\Task\Retryable;
 
-class Exception extends \Exception implements Retryable
+class Exception extends Ex implements Retryable
 {
   /**
    * Optional list of errors returned in a JSON body of an HTTP error response.

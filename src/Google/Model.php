@@ -27,7 +27,7 @@ use Google\Exception;
  * http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5
  *
  */
-class Model implements ArrayAccess
+class Model implements \ArrayAccess
 {
   /**
    * If you need to specify a NULL JSON value, use Google_Model::NULL_VALUE

@@ -21,7 +21,9 @@ use Google\Client;
 use Google\Http\Request;
 use Google\Task\Runner;
 use Google\Service\Exception;
-use Google\Utils\URITemplate:
+use Google\Utils\URITemplate;
+
+include ('../Service/Oauth2.php');
 
 /**
  * This class implements the RESTful transport of apiServiceRequest()'s

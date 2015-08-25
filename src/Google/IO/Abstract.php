@@ -19,13 +19,11 @@
  * Abstract IO base class
  */
 
-namespace Google\IO;
+if (!class_exists('Google_Client')) {
+  require_once dirname(__FILE__) . '/../autoload.php';
+}
 
-use Google\Client;
-use Google\Http\Request;
-use Google\Http\CacheParser;
-
-abstract class NewAbstract
+abstract class Google_IO_Abstract
 {
   const UNKNOWN_CODE = 0;
   const FORM_URLENCODED = 'application/x-www-form-urlencoded';
@@ -46,25 +44,25 @@ abstract class NewAbstract
   );
 
 
-  /** @var Google\Client */
+  /** @var Google_Client */
   protected $client;
 
-  public function __construct(Client $client)
+  public function __construct(Google_Client $client)
   {
     $this->client = $client;
-    $timeout = $client->getClassConfig('Google\IO\NewAbstract', 'request_timeout_seconds');
+    $timeout = $client->getClassConfig('Google_IO_Abstract', 'request_timeout_seconds');
     if ($timeout > 0) {
       $this->setTimeout($timeout);
     }
   }
 
   /**
-   * Executes a Google\Http\Request
-   * @param Google\Http\Request $request the http request to be executed
+   * Executes a Google_Http_Request
+   * @param Google_Http_Request $request the http request to be executed
    * @return array containing response headers, body, and http code
-   * @throws Google\IO\Exception on curl or IO error
+   * @throws Google_IO_Exception on curl or IO error
    */
-  abstract public function executeRequest(Request $request);
+  abstract public function executeRequest(Google_Http_Request $request);
 
   /**
    * Set options that update the transport implementation's behavior.
@@ -98,14 +96,14 @@ abstract class NewAbstract
   /**
    * @visible for testing.
    * Cache the response to an HTTP request if it is cacheable.
-   * @param Google\Http\Request $request
+   * @param Google_Http_Request $request
    * @return bool Returns true if the insertion was successful.
    * Otherwise, return false.
    */
-  public function setCachedRequest(Request $request)
+  public function setCachedRequest(Google_Http_Request $request)
   {
     // Determine if the request is cacheable.
-    if (CacheParser::isResponseCacheable($request)) {
+    if (Google_Http_CacheParser::isResponseCacheable($request)) {
       $this->client->getCache()->set($request->getCacheKey(), $request);
       return true;
     }
@@ -116,16 +114,16 @@ abstract class NewAbstract
   /**
    * Execute an HTTP Request
    *
-   * @param Google\Http\Request $request the http request to be executed
-   * @return Google\Http\Request http request with the response http code,
+   * @param Google_Http_Request $request the http request to be executed
+   * @return Google_Http_Request http request with the response http code,
    * response headers and response body filled in
-   * @throws Google\IO\Exception on curl or IO error
+   * @throws Google_IO_Exception on curl or IO error
    */
-  public function makeRequest(Request $request)
+  public function makeRequest(Google_Http_Request $request)
   {
     // First, check to see if we have a valid cached version.
     $cached = $this->getCachedRequest($request);
-    if ($cached !== false && $cached instanceof Request) {
+    if ($cached !== false && $cached instanceof Google_Http_Request) {
       if (!$this->checkMustRevalidateCachedRequest($cached, $request)) {
         return $cached;
       }
@@ -158,13 +156,13 @@ abstract class NewAbstract
 
   /**
    * @visible for testing.
-   * @param Google\Http\Request $request
-   * @return Google\Http\Request|bool Returns the cached object or
+   * @param Google_Http_Request $request
+   * @return Google_Http_Request|bool Returns the cached object or
    * false if the operation was unsuccessful.
    */
-  public function getCachedRequest(Request $request)
+  public function getCachedRequest(Google_Http_Request $request)
   {
-    if (false === CacheParser::isRequestCacheable($request)) {
+    if (false === Google_Http_CacheParser::isRequestCacheable($request)) {
       return false;
     }
 
@@ -174,10 +172,10 @@ abstract class NewAbstract
   /**
    * @visible for testing
    * Process an http request that contains an enclosed entity.
-   * @param Google\Http\Request $request
-   * @return Google\Http\Request Processed request with the enclosed entity.
+   * @param Google_Http_Request $request
+   * @return Google_Http_Request Processed request with the enclosed entity.
    */
-  public function processEntityRequest(Request $request)
+  public function processEntityRequest(Google_Http_Request $request)
   {
     $postBody = $request->getPostBody();
     $contentType = $request->getRequestHeader("content-type");
@@ -206,14 +204,14 @@ abstract class NewAbstract
   /**
    * Check if an already cached request must be revalidated, and if so update
    * the request with the correct ETag headers.
-   * @param Google\Http\Request $cached A previously cached response.
-   * @param Google\Http\Request $request The outbound request.
+   * @param Google_Http_Request $cached A previously cached response.
+   * @param Google_Http_Request $request The outbound request.
    * return bool If the cached object needs to be revalidated, false if it is
    * still current and can be re-used.
    */
   protected function checkMustRevalidateCachedRequest($cached, $request)
   {
-    if (CacheParser::mustRevalidate($cached)) {
+    if (Google_Http_CacheParser::mustRevalidate($cached)) {
       $addHeaders = array();
       if ($cached->getResponseHeader('etag')) {
         // [13.3.4] If an entity tag has been provided by the origin server,
@@ -232,7 +230,7 @@ abstract class NewAbstract
 
   /**
    * Update a cached request, using the headers from the last response.
-   * @param Google\Http\Request $cached A previously cached response.
+   * @param Google_Http_Request $cached A previously cached response.
    * @param mixed Associative array of response headers from the last request.
    */
   protected function updateCachedRequest($cached, $responseHeaders)

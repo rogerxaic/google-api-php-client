@@ -15,6 +15,14 @@
  * the License.
  */
 
+namespace Google\Service;
+
+use Google\Service;
+use Google\Client;
+use Google\Service\Resource;
+use Google\Collection;
+use Google\Model;
+
 /**
  * Service definition for Oauth2 (v2).
  *
@@ -28,7 +36,7 @@
  *
  * @author Google, Inc.
  */
-class Google_Service_Oauth2 extends Google_Service
+class Oauth2 extends Service
 {
   /** Know your basic profile info and list of people in your circles.. */
   const PLUS_LOGIN =
@@ -50,9 +58,9 @@ class Google_Service_Oauth2 extends Google_Service
   /**
    * Constructs the internal representation of the Oauth2 service.
    *
-   * @param Google_Client $client
+   * @param Google\Client $client
    */
-  public function __construct(Google_Client $client)
+  public function __construct(Client $client)
   {
     parent::__construct($client);
     $this->rootUrl = 'https://www.googleapis.com/';
@@ -60,7 +68,7 @@ class Google_Service_Oauth2 extends Google_Service
     $this->version = 'v2';
     $this->serviceName = 'oauth2';
 
-    $this->userinfo = new Google_Service_Oauth2_Userinfo_Resource(
+    $this->userinfo = new Oauth2\Userinfo\Resource(
         $this,
         $this->serviceName,
         'userinfo',
@@ -74,7 +82,7 @@ class Google_Service_Oauth2 extends Google_Service
           )
         )
     );
-    $this->userinfo_v2_me = new Google_Service_Oauth2_UserinfoV2Me_Resource(
+    $this->userinfo_v2_me = new Oauth2\UserinfoV2Me\Resource(
         $this,
         $this->serviceName,
         'me',
@@ -88,7 +96,7 @@ class Google_Service_Oauth2 extends Google_Service
           )
         )
     );
-    $this->base_methods = new Google_Service_Resource(
+    $this->base_methods = new Resource(
         $this,
         $this->serviceName,
         '',
@@ -124,13 +132,13 @@ class Google_Service_Oauth2 extends Google_Service
    * (getCertForOpenIdConnect)
    *
    * @param array $optParams Optional parameters.
-   * @return Google_Service_Oauth2_Jwk
+   * @return Oauth2_Jwk
    */
   public function getCertForOpenIdConnect($optParams = array())
   {
     $params = array();
     $params = array_merge($params, $optParams);
-    return $this->base_methods->call('getCertForOpenIdConnect', array($params), "Google_Service_Oauth2_Jwk");
+    return $this->base_methods->call('getCertForOpenIdConnect', array($params), "Oauth2\Jwk");
   }
   /**
    * (tokeninfo)
@@ -140,13 +148,13 @@ class Google_Service_Oauth2 extends Google_Service
    * @opt_param string access_token
    * @opt_param string id_token
    * @opt_param string token_handle
-   * @return Google_Service_Oauth2_Tokeninfo
+   * @return Oauth2_Tokeninfo
    */
   public function tokeninfo($optParams = array())
   {
     $params = array();
     $params = array_merge($params, $optParams);
-    return $this->base_methods->call('tokeninfo', array($params), "Google_Service_Oauth2_Tokeninfo");
+    return $this->base_methods->call('tokeninfo', array($params), "Oauth2\Tokeninfo");
   }
 }
 
@@ -159,20 +167,20 @@ class Google_Service_Oauth2 extends Google_Service
  *   $userinfo = $oauth2Service->userinfo;
  *  </code>
  */
-class Google_Service_Oauth2_Userinfo_Resource extends Google_Service_Resource
+class Oauth2_Userinfo_Resource extends Resource
 {
 
   /**
    * (userinfo.get)
    *
    * @param array $optParams Optional parameters.
-   * @return Google_Service_Oauth2_Userinfoplus
+   * @return Oauth2_Userinfoplus
    */
   public function get($optParams = array())
   {
     $params = array();
     $params = array_merge($params, $optParams);
-    return $this->call('get', array($params), "Google_Service_Oauth2_Userinfoplus");
+    return $this->call('get', array($params), "Oauth2_Userinfoplus");
   }
 }
 
@@ -184,7 +192,7 @@ class Google_Service_Oauth2_Userinfo_Resource extends Google_Service_Resource
  *   $v2 = $oauth2Service->v2;
  *  </code>
  */
-class Google_Service_Oauth2_UserinfoV2_Resource extends Google_Service_Resource
+class Oauth2_UserinfoV2_Resource extends Resource
 {
 }
 
@@ -196,7 +204,7 @@ class Google_Service_Oauth2_UserinfoV2_Resource extends Google_Service_Resource
  *   $me = $oauth2Service->me;
  *  </code>
  */
-class Google_Service_Oauth2_UserinfoV2Me_Resource extends Google_Service_Resource
+class Oauth2_UserinfoV2Me_Resource extends Resource
 {
 
   /**
@@ -209,19 +217,19 @@ class Google_Service_Oauth2_UserinfoV2Me_Resource extends Google_Service_Resourc
   {
     $params = array();
     $params = array_merge($params, $optParams);
-    return $this->call('get', array($params), "Google_Service_Oauth2_Userinfoplus");
+    return $this->call('get', array($params), "Oauth2_Userinfoplus");
   }
 }
 
 
 
 
-class Google_Service_Oauth2_Jwk extends Google_Collection
+class Oauth2_Jwk extends Collection
 {
   protected $collection_key = 'keys';
   protected $internal_gapi_mappings = array(
   );
-  protected $keysType = 'Google_Service_Oauth2_JwkKeys';
+  protected $keysType = 'Oauth2_JwkKeys';
   protected $keysDataType = 'array';
 
 
@@ -235,7 +243,7 @@ class Google_Service_Oauth2_Jwk extends Google_Collection
   }
 }
 
-class Google_Service_Oauth2_JwkKeys extends Google_Model
+class Oauth2_JwkKeys extends Model
 {
   protected $internal_gapi_mappings = array(
   );
@@ -297,7 +305,7 @@ class Google_Service_Oauth2_JwkKeys extends Google_Model
   }
 }
 
-class Google_Service_Oauth2_Tokeninfo extends Google_Model
+class Oauth2_Tokeninfo extends Model
 {
   protected $internal_gapi_mappings = array(
         "accessType" => "access_type",
@@ -392,7 +400,7 @@ class Google_Service_Oauth2_Tokeninfo extends Google_Model
   }
 }
 
-class Google_Service_Oauth2_Userinfoplus extends Google_Model
+class Oauth2_Userinfoplus extends Model
 {
   protected $internal_gapi_mappings = array(
         "familyName" => "family_name",

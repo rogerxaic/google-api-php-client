@@ -17,10 +17,10 @@
 
 namespace Google\IO;
 
-use Google\Exception;
+use Google\Exception as Ex;
 use Google\Task\Retryable;
 
-class Exception extends \Exception implements Retryable
+class Exception extends Ex implements Retryable
 {
   /**
    * @var array $retryMap Map of errors with retry counts.

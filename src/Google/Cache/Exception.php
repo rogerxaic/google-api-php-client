@@ -17,8 +17,8 @@
 
 namespace Google\Cache;
 
-use Google\Exception;
+use Google\Exception as Ex;
 
-class Exception extends \Exception
+class Exception extends Ex
 {
 }
