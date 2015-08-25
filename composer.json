@@ -1,9 +1,9 @@
 {
-    "name": "rogerxaic/google-apiclient",
+    "name": "google/apiclient",
     "type": "library",
     "description": "Client library for Google APIs",
     "keywords": ["google"],
-    "homepage": "https://github.com/rogerxaic/google-api-php-client",
+    "homepage": "https://github.com/google/google-api-php-client",
     "license": "Apache-2.0",
     "require": {
         "php": ">=5.2.1"
