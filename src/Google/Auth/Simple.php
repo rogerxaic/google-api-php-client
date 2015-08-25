@@ -15,20 +15,21 @@
  * limitations under the License.
  */
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/../autoload.php';
-}
+namespace Google\Auth;
+
+use Google\Client;
+use Google\Http\Request;
 
 /**
  * Simple API access implementation. Can either be used to make requests
  * completely unauthenticated, or by using a Simple API Access developer
  * key.
  */
-class Google_Auth_Simple extends Google_Auth_Abstract
+class Simple extends NewAbstract
 {
   private $client;
 
-  public function __construct(Google_Client $client, $config = null)
+  public function __construct(Client $client, $config = null)
   {
     $this->client = $client;
   }
@@ -39,17 +40,17 @@ class Google_Auth_Simple extends Google_Auth_Abstract
    * (which can modify the request in what ever way fits the auth mechanism)
    * and then calls apiCurlIO::makeRequest on the signed request
    *
-   * @param Google_Http_Request $request
-   * @return Google_Http_Request The resulting HTTP response including the
+   * @param Google\Http\Request $request
+   * @return Google\Http\Request The resulting HTTP response including the
    * responseHttpCode, responseHeaders and responseBody.
    */
-  public function authenticatedRequest(Google_Http_Request $request)
+  public function authenticatedRequest(Request $request)
   {
     $request = $this->sign($request);
     return $this->io->makeRequest($request);
   }
 
-  public function sign(Google_Http_Request $request)
+  public function sign(Request $request)
   {
     $key = $this->client->getClassConfig($this, 'developer_key');
     if ($key) {

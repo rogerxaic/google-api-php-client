@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/../autoload.php';
-}
+namespace Google\Cache;
+
+use Google\Client;
+use Google\Cache\Exception;
 
 /**
  * A persistent storage class based on the memcache, which is not
@@ -29,7 +30,7 @@ if (!class_exists('Google_Client')) {
  *
  * @author Chris Chabot <chabotc@google.com>
  */
-class Google_Cache_Memcache extends Google_Cache_Abstract
+class Memcache extends NewAbstract
 {
   private $connection = false;
   private $mc = false;
@@ -37,17 +38,17 @@ class Google_Cache_Memcache extends Google_Cache_Abstract
   private $port;
 
   /**
-   * @var Google_Client the current client
+   * @var Google\Client the current client
    */
   private $client;
 
-  public function __construct(Google_Client $client)
+  public function __construct(Client $client)
   {
     if (!function_exists('memcache_connect') && !class_exists("Memcached")) {
       $error = "Memcache functions not available";
 
       $client->getLogger()->error($error);
-      throw new Google_Cache_Exception($error);
+      throw new Exception($error);
     }
 
     $this->client = $client;
@@ -63,7 +64,7 @@ class Google_Cache_Memcache extends Google_Cache_Abstract
         $error = "You need to supply a valid memcache host and port";
 
         $client->getLogger()->error($error);
-        throw new Google_Cache_Exception($error);
+        throw new Exception($error);
       }
     }
   }
@@ -108,7 +109,7 @@ class Google_Cache_Memcache extends Google_Cache_Abstract
    * @inheritDoc
    * @param string $key
    * @param string $value
-   * @throws Google_Cache_Exception
+   * @throws Google\Cache\Exception
    */
   public function set($key, $value)
   {
@@ -128,7 +129,7 @@ class Google_Cache_Memcache extends Google_Cache_Abstract
           array('key' => $key, 'var' => $data)
       );
 
-      throw new Google_Cache_Exception("Couldn't store data in cache");
+      throw new Exception("Couldn't store data in cache");
     }
 
     $this->client->getLogger()->debug(
@@ -178,7 +179,7 @@ class Google_Cache_Memcache extends Google_Cache_Abstract
       $error = "Couldn't connect to memcache server";
 
       $this->client->getLogger()->error($error);
-      throw new Google_Cache_Exception($error);
+      throw new Exception($error);
     }
   }
 }

@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/../autoload.php';
-}
+namespace Google\Cache;
+
+use Google\Client;
+use Google\Cache\Exception;
 
 /*
  * This class implements a basic on disk storage. While that does
@@ -27,18 +28,18 @@ if (!class_exists('Google_Client')) {
  *
  * @author Chris Chabot <chabotc@google.com>
  */
-class Google_Cache_File extends Google_Cache_Abstract
+class File extends NewAbstract
 {
   const MAX_LOCK_RETRIES = 10;
   private $path;
   private $fh;
 
   /**
-   * @var Google_Client the current client
+   * @var Google\Client the current client
    */
   private $client;
 
-  public function __construct(Google_Client $client)
+  public function __construct(Client $client)
   {
     $this->client = $client;
     $this->path = $this->client->getClassConfig($this, 'directory');
@@ -120,7 +121,7 @@ class Google_Cache_File extends Google_Cache_Abstract
           'File cache delete failed',
           array('key' => $key, 'file' => $file)
       );
-      throw new Google_Cache_Exception("Cache file could not be deleted");
+      throw new Exception("Cache file could not be deleted");
     }
 
     $this->client->getLogger()->debug(
@@ -151,7 +152,7 @@ class Google_Cache_File extends Google_Cache_Abstract
             'File cache creation failed',
             array('dir' => $storageDir)
         );
-        throw new Google_Cache_Exception("Could not create storage directory: $storageDir");
+        throw new Exception("Could not create storage directory: $storageDir");
       }
     }
     return $storageDir;

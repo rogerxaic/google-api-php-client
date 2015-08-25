@@ -15,15 +15,19 @@
  * limitations under the License.
  */
 
+namespace Google\Cache;
+
+use Google\Client;
+
 /**
  * Abstract storage class
  *
  * @author Chris Chabot <chabotc@google.com>
  */
-abstract class Google_Cache_Abstract
+abstract class NewAbstract
 {
   
-  abstract public function __construct(Google_Client $client);
+  abstract public function __construct(Client $client);
 
   /**
    * Retrieves the data for the given key, or false if they

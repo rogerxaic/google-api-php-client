@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-class Google_Service
+namespace Google;
+
+class Service
 {
   public $batchPath;
   public $rootUrl;

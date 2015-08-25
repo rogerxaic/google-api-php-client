@@ -15,16 +15,17 @@
  * limitations under the License.
  */
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/../autoload.php';
-}
+namespace Google\Logger;
+
+use Google\Client;
+use Google\Logger\Exception;
 
 /**
  * File logging class based on the PSR-3 standard.
  *
  * This logger writes to a PHP stream resource.
  */
-class Google_Logger_File extends Google_Logger_Abstract
+class File extends NewAbstract
 {
   /**
    * @var string|resource $file Where logs are written
@@ -51,23 +52,23 @@ class Google_Logger_File extends Google_Logger_Abstract
   /**
    * {@inheritdoc}
    */
-  public function __construct(Google_Client $client)
+  public function __construct(Client $client)
   {
     parent::__construct($client);
 
-    $file = $client->getClassConfig('Google_Logger_File', 'file');
+    $file = $client->getClassConfig('Google\Logger\File', 'file');
     if (!is_string($file) && !is_resource($file)) {
-      throw new Google_Logger_Exception(
+      throw new Exception(
           'File logger requires a filename or a valid file pointer'
       );
     }
 
-    $mode = $client->getClassConfig('Google_Logger_File', 'mode');
+    $mode = $client->getClassConfig('Google\Logger\File', 'mode');
     if (!$mode) {
       $this->mode = $mode;
     }
 
-    $this->lock = (bool) $client->getClassConfig('Google_Logger_File', 'lock');
+    $this->lock = (bool) $client->getClassConfig('Google\Logger\File', 'lock');
     $this->file = $file;
   }
 
@@ -79,7 +80,7 @@ class Google_Logger_File extends Google_Logger_Abstract
     if (is_string($this->file)) {
       $this->open();
     } elseif (!is_resource($this->file)) {
-      throw new Google_Logger_Exception('File pointer is no longer available');
+      throw new Exception('File pointer is no longer available');
     }
 
     if ($this->lock) {
@@ -113,7 +114,7 @@ class Google_Logger_File extends Google_Logger_Abstract
 
     // Handles trapped `fopen()` errors.
     if ($this->trappedErrorNumber) {
-      throw new Google_Logger_Exception(
+      throw new Exception(
           sprintf(
               "Logger Error: '%s'",
               $this->trappedErrorString

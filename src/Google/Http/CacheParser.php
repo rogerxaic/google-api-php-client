@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/../autoload.php';
-}
+namespace Google\Http;
+
+use Google\Http\Request;
+use Google\Exception;
 
 /**
  * Implement the caching directives specified in rfc2616. This
  * implementation is guided by the guidance offered in rfc2616-sec13.
  */
-class Google_Http_CacheParser
+class CacheParser
 {
   public static $CACHEABLE_HTTP_METHODS = array('GET', 'HEAD');
   public static $CACHEABLE_STATUS_CODES = array('200', '203', '300', '301');
@@ -32,11 +33,11 @@ class Google_Http_CacheParser
    * Check if an HTTP request can be cached by a private local cache.
    *
    * @static
-   * @param Google_Http_Request $resp
+   * @param Google\Http\Request $resp
    * @return bool True if the request is cacheable.
    * False if the request is uncacheable.
    */
-  public static function isRequestCacheable(Google_Http_Request $resp)
+  public static function isRequestCacheable(Request $resp)
   {
     $method = $resp->getRequestMethod();
     if (! in_array($method, self::$CACHEABLE_HTTP_METHODS)) {
@@ -58,11 +59,11 @@ class Google_Http_CacheParser
    * Check if an HTTP response can be cached by a private local cache.
    *
    * @static
-   * @param Google_Http_Request $resp
+   * @param Google\Http\Request $resp
    * @return bool True if the response is cacheable.
    * False if the response is un-cacheable.
    */
-  public static function isResponseCacheable(Google_Http_Request $resp)
+  public static function isResponseCacheable(Request $resp)
   {
     // First, check if the HTTP request was cacheable before inspecting the
     // HTTP response.
@@ -110,11 +111,11 @@ class Google_Http_CacheParser
 
   /**
    * @static
-   * @param Google_Http_Request $resp
+   * @param Google\Http\Request $resp
    * @return bool True if the HTTP response is considered to be expired.
    * False if it is considered to be fresh.
    */
-  public static function isExpired(Google_Http_Request $resp)
+  public static function isExpired(Request $resp)
   {
     // HTTP/1.1 clients and caches MUST treat other invalid date formats,
     // especially including the value “0”, as in the past.
@@ -149,7 +150,7 @@ class Google_Http_CacheParser
       // We can't default this to now, as that means future cache reads
       // will always pass with the logic below, so we will require a
       // date be injected if not supplied.
-      throw new Google_Exception("All cacheable requests must have creation dates.");
+      throw new Exception("All cacheable requests must have creation dates.");
     }
 
     if (false == $freshnessLifetime && isset($responseHeaders['expires'])) {
@@ -172,10 +173,10 @@ class Google_Http_CacheParser
   /**
    * Determine if a cache entry should be revalidated with by the origin.
    *
-   * @param Google_Http_Request $response
+   * @param Google\Http\Request $response
    * @return bool True if the entry is expired, else return false.
    */
-  public static function mustRevalidate(Google_Http_Request $response)
+  public static function mustRevalidate(Request $response)
   {
     // [13.3] When a cache has a stale entry that it would like to use as a
     // response to a client's request, it first has to check with the origin

@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/../autoload.php';
-}
+namespace Google\Cache;
 
-class Google_Cache_Exception extends Google_Exception
+use Google\Exception;
+
+class Exception extends \Exception
 {
 }

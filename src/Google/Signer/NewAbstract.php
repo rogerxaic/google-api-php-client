@@ -15,16 +15,17 @@
  * limitations under the License.
  */
 
+namespace Google\Signer;
+
 /**
- * Verifies signatures.
+ * Signs data.
  *
  * @author Brian Eaton <beaton@google.com>
  */
-abstract class Google_Verifier_Abstract
+abstract class NewAbstract
 {
   /**
-   * Checks a signature, returns true if the signature is correct,
-   * false otherwise.
+   * Signs data, returns the signature as binary data.
    */
-  abstract public function verify($data, $signature);
+  abstract public function sign($data);
 }

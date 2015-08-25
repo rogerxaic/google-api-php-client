@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2011 Google Inc.
+ * Copyright 2010 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,24 @@
  * limitations under the License.
  */
 
+namespace Google\Auth;
+
+use Google\Http\Request;
+
 /**
- * Signs data.
+ * Abstract class for the Authentication in the API client
+ * @author Chris Chabot <chabotc@google.com>
  *
- * @author Brian Eaton <beaton@google.com>
  */
-abstract class Google_Signer_Abstract
+abstract class NewAbstract
 {
   /**
-   * Signs data, returns the signature as binary data.
+   * An utility function that first calls $this->auth->sign($request) and then
+   * executes makeRequest() on that signed request. Used for when a request
+   * should be authenticated
+   * @param Google_Http_Request $request
+   * @return Google_Http_Request $request
    */
-  abstract public function sign($data);
+  abstract public function authenticatedRequest(Request $request);
+  abstract public function sign(Request $request);
 }

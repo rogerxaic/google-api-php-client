@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
-class Google_Exception extends Exception
+namespace Google;
+
+class Exception extends \Exception
 {
 }

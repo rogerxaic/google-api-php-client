@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/../autoload.php';
-}
+namespace Google\Http;
+
+use Google\Utils;
 
 /**
  * HTTP Request to be executed by IO classes. Upon execution, the
@@ -27,7 +27,7 @@ if (!class_exists('Google_Client')) {
  * @author Chirag Shah <chirags@google.com>
  *
  */
-class Google_Http_Request
+class Request
 {
   const GZIP_UA = " (gzip)";
 
@@ -222,7 +222,7 @@ class Google_Http_Request
    */
   public function setResponseHeaders($headers)
   {
-    $headers = Google_Utils::normalize($headers);
+    $headers = Utils::normalize($headers);
     if ($this->responseHeaders) {
       $headers = array_merge($this->responseHeaders, $headers);
     }
@@ -340,7 +340,7 @@ class Google_Http_Request
    */
   public function setRequestHeaders($headers)
   {
-    $headers = Google_Utils::normalize($headers);
+    $headers = Utils::normalize($headers);
     if ($this->requestHeaders) {
       $headers = array_merge($this->requestHeaders, $headers);
     }

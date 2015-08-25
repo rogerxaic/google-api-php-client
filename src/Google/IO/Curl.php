@@ -16,28 +16,30 @@
  */
 
 /**
- * Curl based implementation of Google_IO.
+ * Curl based implementation of Google\IO.
  *
  * @author Stuart Langley <slangley@google.com>
  */
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/../autoload.php';
-}
+namespace Google\IO;
 
-class Google_IO_Curl extends Google_IO_Abstract
+use Google\Client;
+use Google\IO\Exception;
+use Google\Http\Request;
+
+class Curl extends NewAbstract
 {
   // cURL hex representation of version 7.30.0
   const NO_QUIRK_VERSION = 0x071E00;
 
   private $options = array();
 
-  public function __construct(Google_Client $client)
+  public function __construct(Client $client)
   {
     if (!extension_loaded('curl')) {
       $error = 'The cURL IO handler requires the cURL extension to be enabled';
       $client->getLogger()->critical($error);
-      throw new Google_IO_Exception($error);
+      throw new Exception($error);
     }
 
     parent::__construct($client);
@@ -46,11 +48,11 @@ class Google_IO_Curl extends Google_IO_Abstract
   /**
    * Execute an HTTP Request
    *
-   * @param Google_Http_Request $request the http request to be executed
+   * @param Google\Http\Request $request the http request to be executed
    * @return array containing response headers, body, and http code
-   * @throws Google_IO_Exception on curl or IO error
+   * @throws Google\IO\Exception on curl or IO error
    */
-  public function executeRequest(Google_Http_Request $request)
+  public function executeRequest(Request $request)
   {
     $curl = curl_init();
 
@@ -82,7 +84,7 @@ class Google_IO_Curl extends Google_IO_Abstract
       curl_setopt($curl, CURLOPT_ENCODING, 'gzip,deflate');
     }
     
-    $options = $this->client->getClassConfig('Google_IO_Curl', 'options');
+    $options = $this->client->getClassConfig('Google\IO\Curl', 'options');
     if (is_array($options)) {
       $this->setOptions($options);
     }
@@ -109,10 +111,10 @@ class Google_IO_Curl extends Google_IO_Abstract
     if ($response === false) {
       $error = curl_error($curl);
       $code = curl_errno($curl);
-      $map = $this->client->getClassConfig('Google_IO_Exception', 'retry_map');
+      $map = $this->client->getClassConfig('Google\IO\Exception', 'retry_map');
 
       $this->client->getLogger()->error('cURL ' . $error);
-      throw new Google_IO_Exception($error, $code, null, $map);
+      throw new Exception($error, $code, null, $map);
     }
     $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
 
@@ -174,6 +176,6 @@ class Google_IO_Curl extends Google_IO_Abstract
   {
     $ver = curl_version();
     $versionNum = $ver['version_number'];
-    return $versionNum < Google_IO_Curl::NO_QUIRK_VERSION;
+    return $versionNum < Google\IO\Curl::NO_QUIRK_VERSION;
   }
 }

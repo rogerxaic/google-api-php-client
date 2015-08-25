@@ -1,4 +1,4 @@
-<?php
+	<?php
 /*
  * Copyright 2010 Google Inc.
  *
@@ -14,41 +14,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+namespace Google;
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/autoload.php';
-}
+use Google\Config;
+use Google\Exception;
+use Google\Auth\AssertionCredentials;
+use Google\Auth\Exception as GAE;
+use Google\Auth\NewAbstract as GAN;
+use Google\IO\NewAbstract as GIN;
+use Google\Cache\NewAbstract as GCN;
+use Google\Logger\NewAbstract as GLN;
+use Google\Auth\OAuth2;
+use Google\Http\Request;
+use Google\Http\REST;
+use Google\Http\Batch;
 
 /**
  * The Google API Client
  * http://code.google.com/p/google-api-php-client/
  */
-class Google_Client
+class Client
 {
   const LIBVER = "1.1.5";
   const USER_AGENT_SUFFIX = "google-api-php-client/";
   /**
-   * @var Google_Auth_Abstract $auth
+   * @var Google\Auth\NewAbstract $auth
    */
   private $auth;
 
   /**
-   * @var Google_IO_Abstract $io
+   * @var Google\IO\NewAbstract $io
    */
   private $io;
 
   /**
-   * @var Google_Cache_Abstract $cache
+   * @var Google\Cache\NewAbstract $cache
    */
   private $cache;
 
   /**
-   * @var Google_Config $config
+   * @var Google\Config $config
    */
   private $config;
 
   /**
-   * @var Google_Logger_Abstract $logger
+   * @var Google\Logger\NewAbstract $logger
    */
   private $logger;
 
@@ -70,32 +81,32 @@ class Google_Client
   /**
    * Construct the Google Client.
    *
-   * @param $config Google_Config or string for the ini file to load
+   * @param $config Google\Config or string for the ini file to load
    */
   public function __construct($config = null)
   {
     if (is_string($config) && strlen($config)) {
-      $config = new Google_Config($config);
-    } else if ( !($config instanceof Google_Config)) {
-      $config = new Google_Config();
+      $config = new Config($config);
+    } else if ( !($config instanceof Config)) {
+      $config = new Config();
 
       if ($this->isAppEngine()) {
         // Automatically use Memcache if we're in AppEngine.
-        $config->setCacheClass('Google_Cache_Memcache');
+        $config->setCacheClass('Google\Cache\Memcache');
       }
 
       if (version_compare(phpversion(), "5.3.4", "<=") || $this->isAppEngine()) {
         // Automatically disable compress.zlib, as currently unsupported.
-        $config->setClassConfig('Google_Http_Request', 'disable_gzip', true);
+        $config->setClassConfig('Google\Http\Request', 'disable_gzip', true);
       }
     }
 
-    if ($config->getIoClass() == Google_Config::USE_AUTO_IO_SELECTION) {
+    if ($config->getIoClass() == Config::USE_AUTO_IO_SELECTION) {
       if (function_exists('curl_version') && function_exists('curl_exec')
           && !$this->isAppEngine()) {
-        $config->setIoClass("Google_IO_Curl");
+        $config->setIoClass("Google\IO\Curl");
       } else {
-        $config->setIoClass("Google_IO_Stream");
+        $config->setIoClass("Google\IO\Stream");
       }
     }
 
@@ -136,7 +147,7 @@ class Google_Client
    *
    * @param string $jsonLocation File location of the project-key.json.
    * @param array $scopes The scopes to assert.
-   * @return Google_Auth_AssertionCredentials.
+   * @return Google\Auth\AssertionCredentials.
    * @
    */
   public function loadServiceAccountJson($jsonLocation, $scopes)
@@ -144,14 +155,14 @@ class Google_Client
     $data = json_decode(file_get_contents($jsonLocation));
     if (isset($data->type) && $data->type == 'service_account') {
       // Service Account format.
-      $cred = new Google_Auth_AssertionCredentials(
+      $cred = new AssertionCredentials(
           $data->client_email,
           $scopes,
           $data->private_key
       );
       return $cred;
     } else {
-      throw new Google_Exception("Invalid service account JSON file.");
+      throw new Exception("Invalid service account JSON file.");
     }
   }
 
@@ -161,14 +172,14 @@ class Google_Client
    * the "Download JSON" button on in the Google Developer
    * Console.
    * @param string $json the configuration json
-   * @throws Google_Exception
+   * @throws Google\Exception
    */
   public function setAuthConfig($json)
   {
     $data = json_decode($json);
     $key = isset($data->installed) ? 'installed' : 'web';
     if (!isset($data->$key)) {
-      throw new Google_Exception("Invalid client secret JSON file.");
+      throw new Exception("Invalid client secret JSON file.");
     }
     $this->setClientId($data->$key->client_id);
     $this->setClientSecret($data->$key->client_secret);
@@ -190,14 +201,14 @@ class Google_Client
   }
 
   /**
-   * @throws Google_Auth_Exception
+   * @throws Google\Auth\Exception
    * @return array
    * @visible For Testing
    */
   public function prepareScopes()
   {
     if (empty($this->requestedScopes)) {
-      throw new Google_Auth_Exception("No scopes specified");
+      throw new GAE("No scopes specified");
     }
     $scopes = implode(' ', $this->requestedScopes);
     return $scopes;
@@ -205,7 +216,7 @@ class Google_Client
 
   /**
    * Set the OAuth 2.0 access token using the string that resulted from calling createAuthUrl()
-   * or Google_Client#getAccessToken().
+   * or Google\Client#getAccessToken().
    * @param string $accessToken JSON encoded string containing in the following format:
    * {"access_token":"TOKEN", "refresh_token":"TOKEN", "token_type":"Bearer",
    *  "expires_in":3600, "id_token":"TOKEN", "created":1320790426}
@@ -222,9 +233,9 @@ class Google_Client
 
   /**
    * Set the authenticator object
-   * @param Google_Auth_Abstract $auth
+   * @param Google\Auth\NewAbstract $auth
    */
-  public function setAuth(Google_Auth_Abstract $auth)
+  public function setAuth(GAN $auth)
   {
     $this->config->setAuthClass(get_class($auth));
     $this->auth = $auth;
@@ -232,9 +243,9 @@ class Google_Client
 
   /**
    * Set the IO object
-   * @param Google_IO_Abstract $io
+   * @param Google\IO\NewAbstract $io
    */
-  public function setIo(Google_IO_Abstract $io)
+  public function setIo(GIN $io)
   {
     $this->config->setIoClass(get_class($io));
     $this->io = $io;
@@ -242,9 +253,9 @@ class Google_Client
 
   /**
    * Set the Cache object
-   * @param Google_Cache_Abstract $cache
+   * @param Google\Cache\NewAbstract $cache
    */
-  public function setCache(Google_Cache_Abstract $cache)
+  public function setCache(GCN $cache)
   {
     $this->config->setCacheClass(get_class($cache));
     $this->cache = $cache;
@@ -252,9 +263,9 @@ class Google_Client
 
   /**
    * Set the Logger object
-   * @param Google_Logger_Abstract $logger
+   * @param Google\Logger\NewAbstract $logger
    */
-  public function setLogger(Google_Logger_Abstract $logger)
+  public function setLogger(GLN $logger)
   {
     $this->config->setLoggerClass(get_class($logger));
     $this->logger = $logger;
@@ -460,7 +471,7 @@ class Google_Client
   /**
    * Revoke an OAuth2 access token or refresh token. This method will revoke the current access
    * token, if a token isn't provided.
-   * @throws Google_Auth_Exception
+   * @throws Google\Auth\Exception
    * @param string|null $token The token (access token or a refresh token) that should be revoked.
    * @return boolean Returns True if the revocation was successful, otherwise False.
    */
@@ -472,9 +483,9 @@ class Google_Client
   /**
    * Verify an id_token. This method will verify the current id_token, if one
    * isn't provided.
-   * @throws Google_Auth_Exception
+   * @throws Google\Auth\Exception
    * @param string|null $token The token (id_token) that should be verified.
-   * @return Google_Auth_LoginTicket Returns an apiLoginTicket if the verification was
+   * @return Google\Auth\LoginTicket Returns an apiLoginTicket if the verification was
    * successful.
    */
   public function verifyIdToken($token = null)
@@ -494,15 +505,15 @@ class Google_Client
    */
   public function verifySignedJwt($id_token, $cert_location, $audience, $issuer, $max_expiry = null)
   {
-    $auth = new Google_Auth_OAuth2($this);
+    $auth = new OAuth2($this);
     $certs = $auth->retrieveCertsFromLocation($cert_location);
     return $auth->verifySignedJwtWithCerts($id_token, $certs, $audience, $issuer, $max_expiry);
   }
 
   /**
-   * @param $creds Google_Auth_AssertionCredentials
+   * @param $creds Google\Auth\AssertionCredentials
    */
-  public function setAssertionCredentials(Google_Auth_AssertionCredentials $creds)
+  public function setAssertionCredentials(AssertionCredentials $creds)
   {
     $this->getAuth()->setAssertionCredentials($creds);
   }
@@ -574,27 +585,27 @@ class Google_Client
   /**
    * Helper method to execute deferred HTTP requests.
    *
-   * @param $request Google_Http_Request|Google_Http_Batch
-   * @throws Google_Exception
+   * @param $request Google\Http\Request|Google\Http\Batch
+   * @throws Google\Exception
    * @return object of the type of the expected class or array.
    */
   public function execute($request)
   {
-    if ($request instanceof Google_Http_Request) {
+    if ($request instanceof Request) {
       $request->setUserAgent(
           $this->getApplicationName()
           . " " . self::USER_AGENT_SUFFIX
           . $this->getLibraryVersion()
       );
-      if (!$this->getClassConfig("Google_Http_Request", "disable_gzip")) {
+      if (!$this->getClassConfig("Google\Http\Request", "disable_gzip")) {
         $request->enableGzip();
       }
       $request->maybeMoveParametersToBody();
-      return Google_Http_REST::execute($this, $request);
-    } else if ($request instanceof Google_Http_Batch) {
+      return REST::execute($this, $request);
+    } else if ($request instanceof Batch) {
       return $request->execute();
     } else {
-      throw new Google_Exception("Do not know how to execute this type of object.");
+      throw new Exception("Do not know how to execute this type of object.");
     }
   }
 
@@ -608,7 +619,7 @@ class Google_Client
   }
 
   /**
-   * @return Google_Auth_Abstract Authentication implementation
+   * @return Google\Auth\NewAbstract Authentication implementation
    */
   public function getAuth()
   {
@@ -620,7 +631,7 @@ class Google_Client
   }
 
   /**
-   * @return Google_IO_Abstract IO implementation
+   * @return Google\IO\NewAbstract IO implementation
    */
   public function getIo()
   {
@@ -632,7 +643,7 @@ class Google_Client
   }
 
   /**
-   * @return Google_Cache_Abstract Cache implementation
+   * @return Google\Cache\NewAbstract Cache implementation
    */
   public function getCache()
   {
@@ -644,7 +655,7 @@ class Google_Client
   }
 
   /**
-   * @return Google_Logger_Abstract Logger implementation
+   * @return Google\Logger\NewAbstract Logger implementation
    */
   public function getLogger()
   {
@@ -671,7 +682,7 @@ class Google_Client
 
   /**
    * Set configuration specific to a given class.
-   * $config->setClassConfig('Google_Cache_File',
+   * $config->setClassConfig('Google\Cache\File',
    *   array('directory' => '/tmp/cache'));
    * @param $class string|object - The class name for the configuration
    * @param $config string key or an array of configuration values

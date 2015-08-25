@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-if (!class_exists('Google_Client')) {
-  require_once dirname(__FILE__) . '/../autoload.php';
-}
+namespace Google\IO;
 
-class Google_IO_Exception extends Google_Exception implements Google_Task_Retryable
+use Google\Exception;
+use Google\Task\Retryable;
+
+class Exception extends \Exception implements Retryable
 {
   /**
    * @var array $retryMap Map of errors with retry counts.
