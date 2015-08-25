@@ -1,5 +1,5 @@
 {
-    "name": "rogerxaic/apiclient",
+    "name": "rogerxaic/google-apiclient",
     "type": "library",
     "description": "Client library for Google APIs",
     "keywords": ["google"],
